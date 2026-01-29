@@ -1,0 +1,13 @@
+{
+  "goal": "string",
+  "assumptions": ["string"],
+  "steps": [
+    {
+      "step_id": "number",
+      "description": "string",
+      "tool_required": "string",
+      "expected_output": "string"
+    }
+  ],
+  "success_criteria": ["string"]
+}
