@@ -33,3 +33,5 @@ User → Planner → Validator → Tool Executor → Memory
 python -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
+
+'NEW UPDATE WILL COME EVENTUALLY'
