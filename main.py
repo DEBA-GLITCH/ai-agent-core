@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from groq import Groq
 from utils.validator import validate_plan
 from executor.tool_executor import execute_tool
+from memory.execution_memory import ExecutionMemory
 
 
 
@@ -93,15 +94,26 @@ if not success:
 
 
 
-# TOOL EXECUTION
+# TOOL EXECUTION LOOP
+
+memory = ExecutionMemory()
+
 
 
 for step in parsed["steps"]:
     tool = step["tool_required"].lower().strip()
+    tool_input = step["tool_input"].strip()
 
-    if tool != "none":
+    if tool == "none":
+        continue
+
+    if memory.has(tool, tool_input):
+        print(f"\n♻️ Reusing cached result for {tool}")
+        result = memory.get(tool, tool_input)
+    else:
         print(f"\n🔧 Executing tool: {tool}")
-        result = execute_tool(tool, step["tool_input"])
-        print("Tool output:", result)
+        result = execute_tool(tool, tool_input)
+        memory.store(tool, tool_input, result)
 
+    print("Tool output:", result)
 
