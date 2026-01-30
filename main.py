@@ -101,7 +101,7 @@ for step in parsed["steps"]:
 
     if tool != "none":
         print(f"\n🔧 Executing tool: {tool}")
-        result = execute_tool(tool, step["description"])
+        result = execute_tool(tool, step["tool_input"])
         print("Tool output:", result)
 
 

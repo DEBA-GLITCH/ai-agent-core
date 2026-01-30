@@ -1,13 +1,35 @@
 {
-  "goal": "string",
-  "assumptions": ["string"],
-  "steps": [
-    {
-      "step_id": "number",
-      "description": "string",
-      "tool_required": "string",
-      "expected_output": "string"
+  "type": "object",
+  "properties": {
+    "goal": { "type": "string" },
+    "assumptions": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step_id": { "type": "number" },
+          "description": { "type": "string" },
+          "tool_required": { "type": "string" },
+          "tool_input": { "type": "string" },
+          "expected_output": { "type": "string" }
+        },
+        "required": [
+          "step_id",
+          "description",
+          "tool_required",
+          "tool_input",
+          "expected_output"
+        ]
+      }
+    },
+    "success_criteria": {
+      "type": "array",
+      "items": { "type": "string" }
     }
-  ],
-  "success_criteria": ["string"]
+  },
+  "required": ["goal", "assumptions", "steps", "success_criteria"]
 }

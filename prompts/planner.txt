@@ -28,3 +28,34 @@ STRICT RULES:
 - If unsure, keep steps simple and generic.
 
 Return ONLY the JSON object.
+
+
+TOOL INPUT RULES (MANDATORY):
+
+- If tool_required is "calculator":
+  - tool_input MUST be a valid math expression
+  - Example: "10 + 20 + 30"
+
+- If tool_required is "file_reader":
+  - tool_input MUST be a valid file path
+  - Example: "data/notes.txt"
+
+- If tool_required is "none":
+  - tool_input MUST be an empty string ""
+
+- NEVER describe the action in tool_input.
+- tool_input is for machines, not humans.
+
+IMPORTANT TOOL RULES:
+
+- NEVER create multiple steps using the same tool unless the tool_input is different.
+- If a calculation is already performed, do NOT repeat it in another step.
+- If tool_required is "calculator", tool_input MUST NOT be empty.
+- If tool_input is empty, tool_required MUST be "none".
+
+EFFICIENCY RULES:
+
+- Do NOT repeat the same calculation in multiple steps.
+- If a result is already computed, reference it instead of recalculating.
+- Each tool_input must be unique unless repetition is strictly necessary.
+
