@@ -3,35 +3,42 @@ import json
 from dotenv import load_dotenv
 from groq import Groq
 from utils.validator import validate_plan
+from executor.tool_executor import execute_tool
 
 
-# 1. Load environment variables
+
+# ENVIRONMENT SETUP
+
 load_dotenv()
 api_key = os.getenv("GROQ_API_KEY")
 
 if not api_key:
     raise ValueError("GROQ_API_KEY not found in .env")
 
-# 2. Initialize Groq client
 client = Groq(api_key=api_key)
 
 
 
-# 3. Load system prompt
+# LOAD SYSTEM PROMPT
+
+
 with open("prompts/planner.txt", "r") as f:
     system_prompt = f.read()
 
 
 
-# 4. Take user input
+# USER INPUT
+
 user_input = input("Enter your task: ")
 
 
-# 5. Interaction loop with validation
+# AGENT LOOP (PLAN + VALIDATE)
 
 MAX_RETRIES = 3
 attempt = 0
-schema_path = "schemas/plan_schemas.json"
+success = False
+
+schema_path = "schemas/plan_schema.json"
 
 messages = [
     {"role": "system", "content": system_prompt},
@@ -43,35 +50,58 @@ while attempt < MAX_RETRIES:
         model="llama-3.1-8b-instant",
         messages=messages,
         temperature=0.2
-    ) 
+    )
 
     output_text = response.choices[0].message.content
 
-    # 1️⃣ JSON parse check
+    # ---- JSON PARSE CHECK ----
     try:
         parsed = json.loads(output_text)
     except json.JSONDecodeError:
         messages.append({
             "role": "system",
-            "content": "Your previous response was NOT valid JSON. Return ONLY valid JSON strictly following the schema."
+            "content": "Your previous response was NOT valid JSON. "
+                       "Return ONLY valid JSON strictly following the schema."
         })
         attempt += 1
         continue
 
-    # 2️⃣ Schema validation
+    # ---- SCHEMA VALIDATION ----
     is_valid, error_msg = validate_plan(parsed, schema_path)
     if not is_valid:
         messages.append({
             "role": "system",
-            "content": f"Schema error: {error_msg}. Fix the JSON to strictly match the schema."
+            "content": f"Schema error: {error_msg}. "
+                       "Fix the JSON to strictly match the schema."
         })
         attempt += 1
         continue
 
-    # ✅ SUCCESS
+
+
+    # ---- SUCCESS ----
+    print("\n✅ VALID PLAN GENERATED\n")
     print(json.dumps(parsed, indent=2))
+    success = True
     break
 
 else:
     print("❌ Failed to generate valid output after 3 attempts.")
+
+if not success:
+    exit(1)
+
+
+
+# TOOL EXECUTION
+
+
+for step in parsed["steps"]:
+    tool = step["tool_required"].lower().strip()
+
+    if tool != "none":
+        print(f"\n🔧 Executing tool: {tool}")
+        result = execute_tool(tool, step["description"])
+        print("Tool output:", result)
+
 
