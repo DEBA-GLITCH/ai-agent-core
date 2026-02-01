@@ -2,7 +2,7 @@
 
 A minimal, production-style AI agent framework built from scratch without agent libraries.
 
-This project demonstrates how to build a real AI agent with:
+This project demonstrates :
 - Planning
 - Validation
 - Tool execution
